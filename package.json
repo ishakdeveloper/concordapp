@@ -1,0 +1,44 @@
+{
+  "name": "@concord/root",
+  "private": true,
+  "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "bunx concurrently \"bun run --cwd apps/web dev\" \"bun run --cwd apps/server dev\"",
+    "build": "bun run build",
+    "lint": "eslint . --ext .ts,.tsx",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "prepare": "husky install",
+    "pre-commit": "lint-staged",
+    "commit-msg": "commitlint --edit $1",
+    "db:generate": "bun run --cwd packages/database --env-file=.env.development db:generate",
+    "db:push": "bun run --cwd packages/database --env-file=.env.development db:push",
+    "db:migrate": "bun run --cwd packages/database --env-file=.env.development db:migrate",
+    "db:studio": "bun run --cwd packages/database --env-file=.env.development db:studio",
+    "db:generate:prod": "bun run --cwd packages/database --env-file=.env.production db:generate",
+    "db:push:prod": "bun run --cwd packages/database --env-file=.env.production db:push",
+    "db:migrate:prod": "bun run --cwd packages/database --env-file=.env.production db:migrate",
+    "db:studio:prod": "bun run --cwd packages/database --env-file=.env.production db:studio",
+    "setup:env": "bun ./scripts/setup-env.ts",
+    "cleanup:env": "bun ./scripts/cleanup-env.ts"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^18.6.0",
+    "@commitlint/config-conventional": "^18.6.0",
+    "@types/bun": "latest",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "concurrently": "^8.2.2",
+    "eslint": "^8.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "husky": "^9.0.0",
+    "lint-staged": "^15.0.0",
+    "prettier": "^3.0.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,md}": "prettier --write"
+  }
+}

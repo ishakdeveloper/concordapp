@@ -1,0 +1,28 @@
+{
+  "name": "@concord/server",
+  "version": "1.0.50",
+  "type": "module",
+  "main": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "bun run --watch src/index.ts"
+  },
+  "dependencies": {
+    "@better-auth/expo": "^1.1.14",
+    "@elysiajs/cors": "^1.2.0",
+    "@elysiajs/static": "^1.2.0",
+    "@elysiajs/swagger": "^1.2.0",
+    "@paralleldrive/cuid2": "^2.2.2",
+    "@concord/database": "workspace:*",
+    "better-auth": "^1.1.14",
+    "elysia": "latest",
+    "@concord/common": "workspace:*"
+  },
+  "devDependencies": {
+    "bun-types": "latest"
+  },
+  "module": "src/index.js"
+}
