@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -18,11 +20,19 @@ import { cn } from '@/lib/utils';
 import { authClient } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
 
-interface RegisterFormData {
-  email: string;
-  username: string;
-  password: string;
-}
+const registerSchema = z
+  .object({
+    email: z.string().email('Invalid email address'),
+    username: z.string().min(3, 'Username must be at least 3 characters'),
+    password: z.string().min(8, 'Password must be at least 8 characters'),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+  });
+
+type RegisterFormData = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -32,19 +42,20 @@ export default function RegisterPage() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<RegisterFormData>();
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+  });
 
   async function onSubmit(data: RegisterFormData) {
     setIsLoading(true);
     try {
-      // Implement your registration logic here
       await authClient.signUp.email({
         email: data.email,
         password: data.password,
         name: data.username,
         fetchOptions: {
           onSuccess: () => {
-            router.push('/aanbod');
+            router.push('/channels/me');
           },
         },
       });
@@ -99,13 +110,7 @@ export default function RegisterPage() {
                   id="email"
                   type="email"
                   disabled={isLoading}
-                  {...register('email', {
-                    required: 'Email is required',
-                    pattern: {
-                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: 'Invalid email address',
-                    },
-                  })}
+                  {...register('email')}
                   className={cn(errors.email && 'border-red-500')}
                 />
                 {errors.email && (
@@ -118,13 +123,7 @@ export default function RegisterPage() {
                   id="username"
                   type="text"
                   disabled={isLoading}
-                  {...register('username', {
-                    required: 'Username is required',
-                    minLength: {
-                      value: 3,
-                      message: 'Username must be at least 3 characters',
-                    },
-                  })}
+                  {...register('username')}
                   className={cn(errors.username && 'border-red-500')}
                 />
                 {errors.username && (
@@ -139,18 +138,27 @@ export default function RegisterPage() {
                   id="password"
                   type="password"
                   disabled={isLoading}
-                  {...register('password', {
-                    required: 'Password is required',
-                    minLength: {
-                      value: 8,
-                      message: 'Password must be at least 8 characters',
-                    },
-                  })}
+                  {...register('password')}
                   className={cn(errors.password && 'border-red-500')}
                 />
                 {errors.password && (
                   <p className="text-sm text-red-500">
                     {errors.password.message}
+                  </p>
+                )}
+              </div>
+              <div className="grid gap-1">
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  disabled={isLoading}
+                  {...register('confirmPassword')}
+                  className={cn(errors.confirmPassword && 'border-red-500')}
+                />
+                {errors.confirmPassword && (
+                  <p className="text-sm text-red-500">
+                    {errors.confirmPassword.message}
                   </p>
                 )}
               </div>

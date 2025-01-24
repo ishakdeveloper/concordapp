@@ -10,11 +10,10 @@ import {
 import { pgTable } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
-import { index } from 'drizzle-orm/pg-core';
 
-export const users = pgTable('users', {
+export const user = pgTable('user', {
   id: pgCuid2('id').defaultRandom().primaryKey(),
-  username: text('username').notNull().unique(),
+  name: text('name').notNull().unique(),
   displayName: text('display_name').notNull(),
   discriminator: text('discriminator').notNull(),
   email: text('email').notNull().unique(),
@@ -36,7 +35,7 @@ export const users = pgTable('users', {
   deletedAt: timestamp('deleted_at'),
 });
 
-export const sessions = pgTable('sessions', {
+export const session = pgTable('session', {
   id: pgCuid2('id').defaultRandom().primaryKey(),
   expiresAt: timestamp('expires_at').notNull(),
   token: text('token').notNull().unique(),
@@ -46,16 +45,16 @@ export const sessions = pgTable('sessions', {
   userAgent: text('user_agent'),
   userId: pgCuid2('user_id')
     .notNull()
-    .references(() => users.id),
+    .references(() => user.id),
 });
 
-export const accounts = pgTable('accounts', {
+export const account = pgTable('account', {
   id: pgCuid2('id').defaultRandom().primaryKey(),
   accountId: pgCuid2('account_id').notNull(),
   providerId: pgCuid2('provider_id').notNull(),
   userId: pgCuid2('user_id')
     .notNull()
-    .references(() => users.id),
+    .references(() => user.id),
   accessToken: text('access_token'),
   refreshToken: text('refresh_token'),
   idToken: text('id_token'),
@@ -67,7 +66,7 @@ export const accounts = pgTable('accounts', {
   updatedAt: timestamp('updated_at').notNull(),
 });
 
-export const verifications = pgTable('verifications', {
+export const verification = pgTable('verification', {
   id: pgCuid2('id').defaultRandom().primaryKey(),
   identifier: text('identifier').notNull(),
   value: text('value').notNull(),
@@ -80,10 +79,10 @@ export const friendships = pgTable('friendships', {
   id: pgCuid2('id').defaultRandom().primaryKey(),
   userId: pgCuid2('user_id')
     .notNull()
-    .references(() => users.id),
+    .references(() => user.id),
   friendId: pgCuid2('friend_id')
     .notNull()
-    .references(() => users.id),
+    .references(() => user.id),
   status: text('status').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
@@ -97,7 +96,7 @@ export const guilds = pgTable('guilds', {
   banner: text('banner'),
   ownerId: pgCuid2('owner_id')
     .notNull()
-    .references(() => users.id),
+    .references(() => user.id),
   isPublic: boolean('is_public').default(false),
   verificationLevel: integer('verification_level').default(0),
   defaultChannelId: pgCuid2('default_channel_id'),
@@ -148,7 +147,7 @@ export const guildMembers = pgTable('guild_members', {
     .references(() => guilds.id),
   userId: pgCuid2('user_id')
     .notNull()
-    .references(() => users.id),
+    .references(() => user.id),
   nickname: text('nickname'),
   avatar: text('avatar'),
   joinedAt: timestamp('joined_at').notNull().defaultNow(),
@@ -190,7 +189,7 @@ export const messages = pgTable('messages', {
     .references(() => channels.id),
   authorId: pgCuid2('author_id')
     .notNull()
-    .references(() => users.id),
+    .references(() => user.id),
   type: text('type').notNull(),
   isSystem: boolean('is_system').notNull().default(false),
   isPinned: boolean('is_pinned').default(false),
@@ -210,7 +209,7 @@ export const reactions = pgTable('reactions', {
     .references(() => messages.id),
   userId: pgCuid2('user_id')
     .notNull()
-    .references(() => users.id),
+    .references(() => user.id),
   emoji: text('emoji').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
@@ -222,7 +221,7 @@ export const threads = pgTable('threads', {
     .references(() => channels.id),
   ownerId: pgCuid2('owner_id')
     .notNull()
-    .references(() => users.id),
+    .references(() => user.id),
   name: text('name').notNull(),
   messageId: pgCuid2('message_id').references(() => messages.id),
   isArchived: boolean('is_archived').default(false),
@@ -238,7 +237,7 @@ export const threadMembers = pgTable('thread_members', {
     .references(() => threads.id),
   userId: pgCuid2('user_id')
     .notNull()
-    .references(() => users.id),
+    .references(() => user.id),
   joinedAt: timestamp('joined_at').notNull().defaultNow(),
 });
 
@@ -253,7 +252,7 @@ export const invites = pgTable('invites', {
     .references(() => channels.id),
   inviterId: pgCuid2('inviter_id')
     .notNull()
-    .references(() => users.id),
+    .references(() => user.id),
   maxUses: integer('max_uses'),
   uses: integer('uses').default(0),
   expiresAt: timestamp('expires_at'),
@@ -267,11 +266,11 @@ export const bans = pgTable('bans', {
     .references(() => guilds.id),
   userId: pgCuid2('user_id')
     .notNull()
-    .references(() => users.id),
+    .references(() => user.id),
   reason: text('reason'),
   moderatorId: pgCuid2('moderator_id')
     .notNull()
-    .references(() => users.id),
+    .references(() => user.id),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
@@ -282,7 +281,7 @@ export const auditLogs = pgTable('audit_logs', {
     .references(() => guilds.id),
   executorId: pgCuid2('executor_id')
     .notNull()
-    .references(() => users.id),
+    .references(() => user.id),
   targetId: pgCuid2('target_id'),
   actionType: text('action_type').notNull(),
   changes: jsonb('changes'),
@@ -298,7 +297,7 @@ export const emojis = pgTable('emojis', {
     .references(() => guilds.id),
   creatorId: pgCuid2('creator_id')
     .notNull()
-    .references(() => users.id),
+    .references(() => user.id),
   animated: boolean('animated').default(false),
   url: text('url').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
@@ -314,7 +313,7 @@ export const webhooks = pgTable('webhooks', {
     .references(() => channels.id),
   creatorId: pgCuid2('creator_id')
     .notNull()
-    .references(() => users.id),
+    .references(() => user.id),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });
@@ -324,7 +323,7 @@ export const conversations = pgTable('conversations', {
   isGroup: boolean('is_group').notNull().default(false),
   name: text('name'),
   icon: text('icon'),
-  ownerId: pgCuid2('owner_id').references(() => users.id),
+  ownerId: pgCuid2('owner_id').references(() => user.id),
   lastMessageId: pgCuid2('last_message_id').references(() => messages.id),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
@@ -337,7 +336,7 @@ export const conversationMembers = pgTable('conversation_members', {
     .references(() => conversations.id),
   userId: pgCuid2('user_id')
     .notNull()
-    .references(() => users.id),
+    .references(() => user.id),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
@@ -345,7 +344,7 @@ export const notifications = pgTable('notifications', {
   id: pgCuid2('id').defaultRandom().primaryKey(),
   userId: pgCuid2('user_id')
     .notNull()
-    .references(() => users.id),
+    .references(() => user.id),
   type: text('type').notNull(),
   read: boolean('read').default(false),
   data: jsonb('data').notNull(),
@@ -358,10 +357,10 @@ export const userBlocks = pgTable(
     id: pgCuid2('id').defaultRandom().primaryKey(),
     userId: pgCuid2('user_id')
       .notNull()
-      .references(() => users.id),
+      .references(() => user.id),
     blockedUserId: pgCuid2('blocked_user_id')
       .notNull()
-      .references(() => users.id),
+      .references(() => user.id),
     reason: text('reason'),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at').notNull().defaultNow(),
@@ -374,22 +373,27 @@ export const userBlocks = pgTable(
   })
 );
 
-export const userRelations = relations(users, ({ many }) => ({
-  guilds: many(guildMembers),
+export const userRelations = relations(user, ({ many }) => ({
+  sessions: many(session),
+  accounts: many(account),
+  friendships: many(friendships),
+  guilds: many(guilds),
   messages: many(messages),
-  friends: many(friendships),
+  reactions: many(reactions),
+  threads: many(threads),
+  threadMembers: many(threadMembers),
   blocks: many(userBlocks),
   blockedBy: many(userBlocks, { relationName: 'blockedByUsers' }),
 }));
 
 export const userBlocksRelations = relations(userBlocks, ({ one }) => ({
-  user: one(users, {
+  user: one(user, {
     fields: [userBlocks.userId],
-    references: [users.id],
+    references: [user.id],
   }),
-  blockedUser: one(users, {
+  blockedUser: one(user, {
     fields: [userBlocks.blockedUserId],
-    references: [users.id],
+    references: [user.id],
   }),
 }));
 
@@ -397,9 +401,9 @@ export const guildRelations = relations(guilds, ({ many, one }) => ({
   members: many(guildMembers),
   channels: many(channels),
   roles: many(roles),
-  owner: one(users, {
+  owner: one(user, {
     fields: [guilds.ownerId],
-    references: [users.id],
+    references: [user.id],
   }),
 }));
 
@@ -426,9 +430,9 @@ export const conversationRelations = relations(
   conversations,
   ({ many, one }) => ({
     members: many(conversationMembers),
-    owner: one(users, {
+    owner: one(user, {
       fields: [conversations.ownerId],
-      references: [users.id],
+      references: [user.id],
     }),
     lastMessage: one(messages, {
       fields: [conversations.lastMessageId],
@@ -437,10 +441,10 @@ export const conversationRelations = relations(
   })
 );
 
-export const messageRelations = relations(messages, ({ one }) => ({
-  author: one(users, {
+export const messagesRelations = relations(messages, ({ one }) => ({
+  author: one(user, {
     fields: [messages.authorId],
-    references: [users.id],
+    references: [user.id],
   }),
   channel: one(channels, {
     fields: [messages.channelId],
@@ -455,9 +459,9 @@ export const messageRelations = relations(messages, ({ one }) => ({
 export const guildMemberRelations = relations(
   guildMembers,
   ({ one, many }) => ({
-    user: one(users, {
+    user: one(user, {
       fields: [guildMembers.userId],
-      references: [users.id],
+      references: [user.id],
     }),
     guild: one(guilds, {
       fields: [guildMembers.guildId],
@@ -472,9 +476,9 @@ export const threadRelations = relations(threads, ({ one, many }) => ({
     fields: [threads.channelId],
     references: [channels.id],
   }),
-  owner: one(users, {
+  owner: one(user, {
     fields: [threads.ownerId],
-    references: [users.id],
+    references: [user.id],
   }),
   members: many(threadMembers),
   message: one(messages, {
@@ -488,8 +492,8 @@ export const threadMemberRelations = relations(threadMembers, ({ one }) => ({
     fields: [threadMembers.threadId],
     references: [threads.id],
   }),
-  user: one(users, {
+  user: one(user, {
     fields: [threadMembers.userId],
-    references: [users.id],
+    references: [user.id],
   }),
 }));

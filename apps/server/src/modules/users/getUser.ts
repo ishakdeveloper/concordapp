@@ -1,10 +1,10 @@
 import Elysia from 'elysia';
 import { eq } from 'drizzle-orm';
-import { db, users } from '@concord/database';
+import { db, user } from '@concord/database';
 
 export const getUser = new Elysia().get('/:id', async ({ params: { id } }) => {
-  const data = await db.query.users.findFirst({
-    where: eq(users.id, id),
+  const data = await db.query.user.findFirst({
+    where: eq(user.id, id),
   });
 
   if (!data) {

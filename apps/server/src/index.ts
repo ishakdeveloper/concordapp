@@ -35,3 +35,5 @@ console.log(
 );
 
 export type AppRouter = typeof app;
+
+export * from './lib/auth';

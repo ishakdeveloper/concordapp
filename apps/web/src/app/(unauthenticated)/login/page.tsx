@@ -41,7 +41,7 @@ export default function LoginPage() {
         password: data.password,
         fetchOptions: {
           onSuccess: () => {
-            router.push('/aanbod');
+            router.push('/channels/me');
           },
         },
       });

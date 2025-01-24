@@ -2,8 +2,11 @@ import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { createId } from '@paralleldrive/cuid2';
 import { expo } from '@better-auth/expo';
-import { db } from '@concord/database';
+import { db, eq, user } from '@concord/database';
 import type { Context } from 'elysia';
+import { createAuthMiddleware } from 'better-auth/api';
+import { generateDiscriminator } from '../utils/discriminator';
+import { generateNormalizedUsername } from '../utils/generateUserName';
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -36,10 +39,77 @@ export const auth = betterAuth({
       clientSecret: process.env.DISCORD_CLIENT_SECRET!,
     },
   },
+  user: {
+    additionalFields: {
+      discriminator: {
+        type: 'string',
+        required: false,
+        input: false,
+      },
+      displayName: {
+        type: 'string',
+        required: false,
+        input: false,
+      },
+      bio: {
+        type: 'string',
+        required: false,
+        defaultValue: '',
+      },
+      avatar: {
+        type: 'string',
+        required: false,
+        defaultValue: '',
+      },
+      banner: {
+        type: 'string',
+        required: false,
+        defaultValue: '',
+      },
+      isAdmin: {
+        type: 'boolean',
+        required: false,
+        defaultValue: false,
+        input: false,
+      },
+      isBanned: {
+        type: 'boolean',
+        required: false,
+        defaultValue: false,
+        input: false,
+      },
+    },
+  },
   advanced: {
     cookiePrefix: 'uid',
     generateId: () => {
       return createId();
+    },
+  },
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (ctx) => {
+          console.log('before database hook', ctx);
+
+          // Generate normalized username and display name
+          const { normalizedName, displayName } = generateNormalizedUsername(
+            ctx.name
+          );
+
+          // Generate discriminator based on normalized name
+          const discriminator = await generateDiscriminator(normalizedName);
+
+          return {
+            data: {
+              ...ctx,
+              name: normalizedName, // Use normalized name as the username
+              discriminator,
+              displayName,
+            },
+          };
+        },
+      },
     },
   },
   plugins: [expo()],

@@ -4,9 +4,9 @@ import { existsSync, lstatSync } from 'fs';
 
 const packages = [
   'packages/database',
-  'packages/env',
   'apps/server',
   'apps/web',
+  'packages/common',
 ];
 const envFiles = ['.env.development', '.env.production'];
 

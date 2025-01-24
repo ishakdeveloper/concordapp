@@ -1,5 +1,5 @@
 import Elysia, { t } from 'elysia';
-import { db, users } from '@concord/database';
+import { db, user } from '@concord/database';
 import { eq } from 'drizzle-orm';
 import { join } from 'path';
 import { writeFile } from 'fs/promises';
@@ -25,7 +25,7 @@ export const updateUser = new Elysia().put(
     }
 
     const updatedUser = await db
-      .update(users)
+      .update(user)
       .set({
         ...(body.username && { username: body.username }),
         ...(body.email && { email: body.email }),
@@ -37,7 +37,7 @@ export const updateUser = new Elysia().put(
         ...(bannerUrl && { banner: bannerUrl }),
         updatedAt: new Date(),
       })
-      .where(eq(users.id, id))
+      .where(eq(user.id, id))
       .returning();
 
     if (!updatedUser.length) {

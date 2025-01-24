@@ -3,6 +3,10 @@
   "private": true,
   "module": "index.ts",
   "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "dev": "bunx concurrently \"bun run --cwd apps/web dev\" \"bun run --cwd apps/server dev\"",
     "build": "bun run build",

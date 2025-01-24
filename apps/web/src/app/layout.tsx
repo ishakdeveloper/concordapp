@@ -1,11 +1,10 @@
 import type { Metadata } from 'next';
-import { Rubik } from 'next/font/google';
+import { Outfit } from 'next/font/google';
 import './globals.css';
-import { Header } from '@/components/Header';
 
-const rubik = Rubik({
+const outfit = Outfit({
   subsets: ['latin'],
-  variable: '--font-rubik',
+  variable: '--font-outfit',
 });
 
 export const metadata: Metadata = {
@@ -20,10 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${rubik.variable} antialiased`}>
-        <Header />
-        {children}
-      </body>
+      <body className={`${outfit.variable} antialiased`}>{children}</body>
     </html>
   );
 }

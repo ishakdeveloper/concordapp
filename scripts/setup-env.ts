@@ -4,7 +4,7 @@ import { existsSync } from 'fs';
 
 const packages = [
   'packages/database',
-  'packages/env',
+  'packages/common',
   'apps/server',
   'apps/web',
 ];
